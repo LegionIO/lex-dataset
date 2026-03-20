@@ -6,6 +6,7 @@ module Legion
       class Client
         include Runners::Dataset
         include Runners::Experiment
+        include Runners::Sampling
 
         def initialize(db: nil, **opts)
           @db   = db
