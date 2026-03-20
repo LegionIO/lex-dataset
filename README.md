@@ -52,6 +52,12 @@ client.list_datasets
 | `jsonl` | One JSON object per line |
 | `csv` | Header row + data rows |
 
+## Related Repos
+
+- `lex-eval` — uses datasets as input for LLM evaluation runs
+- `lex-prompt` — versioned prompt templates consumed alongside datasets in evaluation workflows
+- `legion-data` — underlying Sequel database connection (SQLite/PostgreSQL/MySQL)
+
 ## Development
 
 ```bash
