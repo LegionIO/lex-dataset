@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0] - 2026-03-20
+
+### Added
+- `Runners::Sampling`: create datasets from OTel trace spans
+- 4 sampling strategies: recent, random, error_biased, stratified
+- Filters: span_kind, status, time_range
+
 ## [0.1.0] - 2026-03-17
 
 ### Added
