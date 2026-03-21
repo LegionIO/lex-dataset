@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1] - 2026-03-19
+
+### Added
+- `Runners::Dataset#generate_dataset`: uses `legion-llm` to generate test case rows from a natural language description
+- Supports `count:`, `schema:`, and `model:` kwargs; uses `Legion::LLM.structured` when available, falls back to `Legion::LLM.chat`
+- JSON retry logic: retries once with correction prompt if LLM returns invalid JSON; returns error hash after second failure
+- 15 specs covering all paths (structured, chat fallback, retry, error handling)
+
 ## [0.2.0] - 2026-03-20
 
 ### Added
