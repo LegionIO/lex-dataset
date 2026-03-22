@@ -58,7 +58,93 @@ module Legion
               rows: rows.map { |r| { row_index: r[:row_index], input: r[:input], expected_output: r[:expected_output] } } }
           end
 
+          def generate_dataset(name:, description:, count: 10, schema: nil, model: nil, **)
+            return { error: 'legion-llm is not available' } unless llm_available?
+
+            rows = call_llm_for_rows(description: description, count: count, schema: schema, model: model)
+            return rows if rows.is_a?(Hash) && rows[:error]
+
+            result = create_dataset(name: name, description: description, rows: rows)
+            result.merge(generated: true)
+          end
+
           private
+
+          def llm_available?
+            defined?(Legion::LLM) && Legion::LLM.respond_to?(:started?) && Legion::LLM.started?
+          end
+
+          def call_llm_for_rows(description:, count:, schema:, model:)
+            prompt = build_generate_prompt(description: description, count: count, schema: schema)
+            llm_opts = model ? { model: model } : {}
+
+            response = invoke_llm(prompt: prompt, **llm_opts)
+            rows = parse_llm_rows(response)
+
+            if rows.nil?
+              retry_prompt = "#{prompt}\n\nIMPORTANT: Your previous response was not valid JSON. Return ONLY a valid JSON array."
+              response = invoke_llm(prompt: retry_prompt, **llm_opts)
+              rows = parse_llm_rows(response)
+            end
+
+            rows || { error: 'LLM did not return valid JSON after retry' }
+          end
+
+          def invoke_llm(prompt:, **llm_opts)
+            result = if Legion::LLM.respond_to?(:structured)
+                       Legion::LLM.structured(
+                         message: prompt,
+                         schema:  generate_schema,
+                         **llm_opts
+                       )
+                     else
+                       Legion::LLM.chat(message: prompt, **llm_opts)
+                     end
+            content = result.respond_to?(:content) ? result.content : result.to_s
+            content.strip.sub(/\A```(?:json)?\n?/, '').sub(/\n?```\z/, '')
+          end
+
+          def parse_llm_rows(content)
+            parsed = ::JSON.parse(content)
+            return nil unless parsed.is_a?(Array)
+
+            parsed.map do |item|
+              h = item.transform_keys(&:to_sym)
+              { input: h[:input].to_s, expected_output: h[:expected_output]&.to_s }
+            end
+          rescue ::JSON::ParserError
+            nil
+          end
+
+          def build_generate_prompt(description:, count:, schema:)
+            lines = []
+            lines << "You are a test case generator. Generate exactly #{count} test cases as a JSON array."
+            lines << 'Each test case must have "input" and "expected_output" fields.'
+            lines << ''
+            lines << "Description: #{description}"
+            if schema
+              lines << ''
+              lines << 'Schema guidance for inputs and outputs:'
+              lines << "```json\n#{::JSON.generate(schema)}\n```"
+            end
+            lines << ''
+            lines << 'Respond ONLY with a valid JSON array, no other text.'
+            lines.join("\n")
+          end
+
+          def generate_schema
+            {
+              type:  'array',
+              items: {
+                type:       'object',
+                properties: {
+                  input:           { type: 'string' },
+                  expected_output: { type: 'string' }
+                },
+                required:   %w[input expected_output]
+              }
+            }
+          end
 
           def create_version(dataset_id, rows)
             hash = OpenSSL::Digest.new('SHA256').hexdigest(rows.to_s)
