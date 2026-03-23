@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
+require 'bundler/setup'
 require 'rspec'
 require 'sequel'
 require 'json'
 require 'tmpdir'
 require 'fileutils'
+require 'legion/logging'
+require 'legion/settings'
+require 'legion/cache/helper'
+require 'legion/crypt/helper'
+require 'legion/data/helper'
+require 'legion/json/helper'
+require 'legion/transport/helper'
 
 DB = Sequel.sqlite
 
@@ -57,17 +65,18 @@ end
 module Legion
   module Extensions
     module Helpers
-      module Lex; end
+      module Lex
+        include Legion::Logging::Helper
+        include Legion::Settings::Helper
+        include Legion::Cache::Helper
+        include Legion::Crypt::Helper
+        include Legion::Data::Helper
+        include Legion::JSON::Helper
+        include Legion::Transport::Helper
+      end
     end
 
     module Core; end
-  end
-
-  module Logging
-    def self.debug(*); end
-    def self.info(*); end
-    def self.warn(*); end
-    def self.error(*); end
   end
 end
 
