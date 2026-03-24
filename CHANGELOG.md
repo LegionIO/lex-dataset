@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Add `caller:` identity parameter to `Legion::LLM.structured` and `Legion::LLM.chat` call sites in `invoke_llm`, identifying the caller as `{ extension: 'lex-dataset', operation: 'generate' }`
+
 ## [0.2.2] - 2026-03-22
 
 ### Changed

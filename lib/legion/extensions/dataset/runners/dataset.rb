@@ -95,10 +95,11 @@ module Legion
                        Legion::LLM.structured(
                          message: prompt,
                          schema:  generate_schema,
+                         caller:  { extension: 'lex-dataset', operation: 'generate' },
                          **llm_opts
                        )
                      else
-                       Legion::LLM.chat(message: prompt, **llm_opts)
+                       Legion::LLM.chat(message: prompt, caller: { extension: 'lex-dataset', operation: 'generate' }, **llm_opts)
                      end
             content = result.respond_to?(:content) ? result.content : result.to_s
             content.strip.sub(/\A```(?:json)?\n?/, '').sub(/\n?```\z/, '')
