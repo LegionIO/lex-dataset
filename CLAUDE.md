@@ -9,7 +9,7 @@
 Versioned dataset management for LegionIO. Stores named datasets with immutable versioned rows (input/expected-output pairs), content-hash deduplication, and CSV/JSON/JSONL import/export.
 
 **Gem**: `lex-dataset`
-**Version**: 0.1.0
+**Version**: 0.2.1
 **Namespace**: `Legion::Extensions::Dataset`
 
 ## File Structure
