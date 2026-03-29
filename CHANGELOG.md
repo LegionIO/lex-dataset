@@ -1,9 +1,9 @@
 # Changelog
 
-## [0.2.4] - 2026-03-26
+## [0.2.4] - 2026-03-29
 
 ### Changed
-- set remote_invocable? false for local dispatch
+- Add `def self.remote_invocable?` class method returning `false` to `Runners::Dataset` for local dispatch
 
 ## [0.2.3] - 2026-03-24
 

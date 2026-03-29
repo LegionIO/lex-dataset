@@ -8,6 +8,10 @@ module Legion
     module Dataset
       module Runners
         module Dataset
+          def self.remote_invocable?
+            false
+          end
+
           def create_dataset(name:, description: nil, rows: [], **)
             ds_id = db[:datasets].insert(name: name, description: description, created_at: Time.now.utc)
             create_version(ds_id, rows)
@@ -102,7 +106,7 @@ module Legion
                        Legion::LLM.chat(message: prompt, caller: { extension: 'lex-dataset', operation: 'generate' }, **llm_opts)
                      end
             content = result.respond_to?(:content) ? result.content : result.to_s
-            content.strip.sub(/\A```(?:json)?\n?/, '').sub(/\n?```\z/, '')
+            content.strip.sub(/\A(?:json)?\n?/, '').sub(/\n?\z/, '')
           end
 
           def parse_llm_rows(content)
@@ -126,7 +130,7 @@ module Legion
             if schema
               lines << ''
               lines << 'Schema guidance for inputs and outputs:'
-              lines << "```json\n#{::JSON.generate(schema)}\n```"
+              lines << "\n#{::JSON.generate(schema)}\n"
             end
             lines << ''
             lines << 'Respond ONLY with a valid JSON array, no other text.'
