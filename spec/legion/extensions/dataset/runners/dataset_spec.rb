@@ -5,6 +5,16 @@ require 'spec_helper'
 RSpec.describe Legion::Extensions::Dataset::Runners::Dataset do
   let(:client) { Legion::Extensions::Dataset::Client.new(db: DB) }
 
+  describe '.remote_invocable?' do
+    it 'exists as a singleton method' do
+      expect(described_class).to respond_to(:remote_invocable?)
+    end
+
+    it 'returns false to force local dispatch' do
+      expect(described_class.remote_invocable?).to be false
+    end
+  end
+
   describe '#create_dataset' do
     it 'creates a dataset with rows' do
       result = client.create_dataset(

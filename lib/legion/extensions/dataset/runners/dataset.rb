@@ -132,7 +132,8 @@ module Legion
             if schema
               lines << ''
               lines << 'Schema guidance for inputs and outputs:'
-              lines << "\n#{::JSON.generate(schema)}\n"
+              lines << ''
+              lines << ::JSON.generate(schema)
             end
             lines << ''
             lines << 'Respond ONLY with a valid JSON array, no other text.'
