@@ -8,6 +8,8 @@ module Legion
     module Dataset
       module Runners
         module Dataset
+          extend self
+
           def create_dataset(name:, description: nil, rows: [], **)
             ds_id = db[:datasets].insert(name: name, description: description, created_at: Time.now.utc)
             create_version(ds_id, rows)
@@ -62,7 +64,7 @@ module Legion
             return { error: 'legion-llm is not available' } unless llm_available?
 
             rows = call_llm_for_rows(description: description, count: count, schema: schema, model: model)
-            return rows if rows.is_a?(Hash) && rows[:error]
+            return rows if rows.is_a?(Hash) && rows[:error] # rubocop:disable Legion/Extension/RunnerReturnHash
 
             result = create_dataset(name: name, description: description, rows: rows)
             result.merge(generated: true)
@@ -92,14 +94,14 @@ module Legion
 
           def invoke_llm(prompt:, **llm_opts)
             result = if Legion::LLM.respond_to?(:structured)
-                       Legion::LLM.structured(
+                       Legion::LLM.structured( # rubocop:disable Legion/HelperMigration/DirectLlm
                          message: prompt,
                          schema:  generate_schema,
                          caller:  { extension: 'lex-dataset', operation: 'generate' },
                          **llm_opts
                        )
                      else
-                       Legion::LLM.chat(message: prompt, caller: { extension: 'lex-dataset', operation: 'generate' }, **llm_opts)
+                       Legion::LLM.chat(message: prompt, caller: { extension: 'lex-dataset', operation: 'generate' }, **llm_opts) # rubocop:disable Legion/HelperMigration/DirectLlm
                      end
             content = result.respond_to?(:content) ? result.content : result.to_s
             content.strip.sub(/\A```(?:json)?\n?/, '').sub(/\n?```\z/, '')
@@ -107,13 +109,13 @@ module Legion
 
           def parse_llm_rows(content)
             parsed = ::JSON.parse(content)
-            return nil unless parsed.is_a?(Array)
+            return nil unless parsed.is_a?(Array) # rubocop:disable Legion/Extension/RunnerReturnHash
 
             parsed.map do |item|
               h = item.transform_keys(&:to_sym)
               { input: h[:input].to_s, expected_output: h[:expected_output]&.to_s }
             end
-          rescue ::JSON::ParserError
+          rescue ::JSON::ParserError => _e
             nil
           end
 
