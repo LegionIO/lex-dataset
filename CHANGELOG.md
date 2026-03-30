@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.6] - 2026-03-30
+
+### Changed
+- Refine local dispatch behavior by adding a module-level `remote_invocable?` helper alongside `extend self`
+
 ## [0.2.5] - 2026-03-30
 
 ### Changed
