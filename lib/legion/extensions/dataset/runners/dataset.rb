@@ -106,7 +106,7 @@ module Legion
                        Legion::LLM.chat(message: prompt, caller: { extension: 'lex-dataset', operation: 'generate' }, **llm_opts)
                      end
             content = result.respond_to?(:content) ? result.content : result.to_s
-            content.strip.sub(/\A(?:json)?\n?/, '').sub(/\n?\z/, '')
+            content.strip.sub(/\A```(?:json)?\n?/, '').sub(/\n?```\z/, '')
           end
 
           def parse_llm_rows(content)
