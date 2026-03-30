@@ -5,6 +5,8 @@ module Legion
     module Dataset
       module Runners
         module Sampling
+          extend self
+
           def sample_from_traces(dataset_name:, source: :legion_data, filters: {},
                                  sample_size: nil, strategy: :recent, **)
             traces = fetch_traces(source, filters)
@@ -52,7 +54,7 @@ module Legion
 
           def sample_error_biased(traces, size)
             errors, successes = traces.partition { |t| t[:status] == 'error' }
-            return traces unless size
+            return traces unless size # rubocop:disable Legion/Extension/RunnerReturnHash
 
             half = size / 2
             (errors.first(half) + successes.first(size - half)).first(size)
@@ -60,7 +62,7 @@ module Legion
 
           def sample_stratified(traces, size)
             groups = traces.group_by { |t| t[:span_kind] }
-            return traces unless size
+            return traces unless size # rubocop:disable Legion/Extension/RunnerReturnHash
 
             per_group = [size / [groups.size, 1].max, 1].max
             groups.values.flat_map { |g| g.first(per_group) }.first(size)

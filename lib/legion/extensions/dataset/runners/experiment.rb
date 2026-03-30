@@ -7,6 +7,8 @@ module Legion
     module Dataset
       module Runners
         module Experiment
+          extend self
+
           def run_experiment(name:, dataset_name:, task_callable:, dataset_version: nil, evaluators: [], **)
             ds = get_dataset(name: dataset_name, version: dataset_version)
             return { error: ds[:error] } if ds[:error]
@@ -69,7 +71,7 @@ module Legion
 
           def load_experiment_results(name)
             exp = db[:experiments].where(name: name).first
-            return nil unless exp
+            return nil unless exp # rubocop:disable Legion/Extension/RunnerReturnHash
 
             db[:experiment_results].where(experiment_id: exp[:id]).order(:row_index).all
           end
