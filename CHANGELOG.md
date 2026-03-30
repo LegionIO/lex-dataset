@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.6] - 2026-03-30
+
+### Changed
+- merge main (rubocop-legion 0.1.7) into swarm/fix-lex-dataset-2; add `remote_invocable?` alongside `extend self`
+
+## [0.2.5] - 2026-03-30
+
+### Changed
+- update to rubocop-legion 0.1.7, resolve all offenses
+
 ## [0.2.4] - 2026-03-29
 
 ### Changed
